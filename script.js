@@ -25,6 +25,9 @@ const setAnswer = (keys, nr) => {
   const gameMode = document.querySelector('h1').textContent
   let answers = {
     'Prison Break': prisonBreak,
+    'Virus': virus,
+    'Nuclear Countdown': nuclear,
+    'Temple of the Aztec': temple,
   }
   const answer = answers[gameMode]
   const reveal = document.querySelector(`#reveal-${nr}`)
@@ -40,13 +43,19 @@ const setAnswer = (keys, nr) => {
   } else if (keysMapped === answer[nr-1]){
     reveal.textContent = 'Correct'
     keysEl.classList.add('correct')
+    playAudio('assets/correct.wav')
   }else{
     reveal.textContent = 'Wrong'
     keysEl.classList.add('incorrect')
     if(intervalId){
       document.querySelector('#time').classList.add('animate')
-      minutes--
+      if(minutes > 0){
+        minutes--
+      }else{
+        seconds = 1
+      }
     }
+    playAudio('assets/wrong.wav')
   }
 }
 
@@ -89,6 +98,13 @@ document.querySelector('button').addEventListener('click', e => {
         seconds = 59
       }
       timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+      if(minutes === 0 && seconds === 0){
+        clearInterval(intervalId)
+        playAudio('assets/timesup.wav')
+      }else if(minutes % 5 === 0 && seconds === 0){
+        playAudio('assets/info.wav')
+      }
+      
     }, 1000)
   }else{
     e.target.textContent = 'START'
@@ -96,3 +112,8 @@ document.querySelector('button').addEventListener('click', e => {
     intervalId = null
   }
 })
+
+const playAudio = (src) => {
+  const audio = new Audio(src)
+  audio.play();
+}
